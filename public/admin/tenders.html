@@ -269,7 +269,7 @@
                         const deadline = new Date(tender.deadline).toLocaleDateString();
                         const statusBadge = tender.status === 'open'
                             ? '<span class="badge badge-low">Open</span>'
-                            : (tender.status === 'closed' ? '<span class="badge badge-medium">Closed</span>' : '<span class="badge badge-high">Awarded</span>');
+                            : (tender.status === 'closed' ? '<span class="badge badge-medium">Closed</span>' : '<span class="badge badge-low" style="background-color: rgba(16, 185, 129, 0.1); color: var(--alert-green); border-color: rgba(16, 185, 129, 0.3);">Assigned</span>');
 
                         tbody.innerHTML += `
                             <tr>

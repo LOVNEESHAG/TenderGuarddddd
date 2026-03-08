@@ -72,7 +72,7 @@
                             marker.bindPopup(`
                                 <b>${tender.title}</b><br>
                                 Budget: ₹${tender.budget.toLocaleString()}<br>
-                                Status: ${tender.status.toUpperCase()}
+                                Status: ${tender.status === 'awarded' ? 'ASSIGNED' : tender.status.toUpperCase()}
                             `);
                             
                             bounds.extend([tender.location.lat, tender.location.lng]);
@@ -88,7 +88,7 @@
                                     <h4 style="color: var(--text-primary); font-size: 1.125rem;">${tender.title}</h4>
                                 </div>
                                 <div class="mb-3 text-sm" style="color: ${statusColor}; font-weight: 600; text-transform: uppercase;">
-                                    ${tender.status}
+                                    ${tender.status === 'awarded' ? 'ASSIGNED' : tender.status}
                                 </div>
                                 <div class="mb-4 text-sm" style="background: var(--secondary-bg); padding: 1rem; border-radius: var(--radius-md); border: 1px solid var(--border);">
                                     <div class="flex justify-between mb-1">

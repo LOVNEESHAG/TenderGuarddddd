@@ -69,11 +69,11 @@
                 #1. This requires mandatory transparent justification that will be logged in the public audit trail.</p>
             <div class="form-group">
                 <label class="form-label">Justification Reason</label>
-                <textarea class="form-control" rows="4"
+                <textarea id="override-justification" class="form-control" rows="4"
                     placeholder="Explain why the highest ranked bidder was skipped..."></textarea>
             </div>
             <div class="flex gap-4 mt-6">
-                <button type="button" class="btn btn-primary" onclick="closeModal()">Submit Overallude</button>
+                <button type="button" class="btn btn-primary" onclick="submitOverride()">Submit Override</button>
                 <button type="button" class="btn btn-outline" onclick="closeModal()">Cancel</button>
             </div>
         </div>
@@ -191,8 +191,8 @@
 
                                     <div class="flex justify-end mt-4">
                                         ${index === 0
-                                    ? `<button class="btn btn-primary" onclick="alert('Awarded! Audit trail updated.')">Award Tender</button>`
-                                    : `<button class="btn btn-danger" onclick="openOverrideModal()">Override AI & Award</button>`}
+                                    ? `<button class="btn btn-primary" onclick="awardTender('${bid.tender}', '${bid._id}')">Award Tender</button>`
+                                    : `<button class="btn btn-danger" onclick="openOverrideModal('${bid.tender}', '${bid._id}')">Override AI & Award</button>`}
                                     </div>
                                 </div>
                         `;
@@ -201,11 +201,52 @@
             } catch (err) { console.error(err); }
         }
 
-        function openOverrideModal() {
+        let currentOverrideBidId = null;
+        let currentOverrideTenderId = null;
+
+        function openOverrideModal(tenderId, bidId) {
+            currentOverrideTenderId = tenderId;
+            currentOverrideBidId = bidId;
             document.getElementById('override-modal').classList.remove('hidden');
         }
         function closeModal() {
+            currentOverrideTenderId = null;
+            currentOverrideBidId = null;
+            document.getElementById('override-justification').value = '';
             document.getElementById('override-modal').classList.add('hidden');
+        }
+
+        async function submitOverride() {
+            const justification = document.getElementById('override-justification').value;
+            if (!justification.trim()) {
+                alert('You must provide a justification.');
+                return;
+            }
+            await awardTender(currentOverrideTenderId, currentOverrideBidId, justification);
+            closeModal();
+        }
+
+        async function awardTender(tenderId, bidId, justification = '') {
+            if (!justification && !confirm('Are you sure you want to award this tender to the top AI recommended bidder?')) return;
+            
+            try {
+                const payload = {
+                    status: 'awarded',
+                    winningBid: bidId
+                };
+                // In a real app we would lock the bid and add the justification to an audit table
+                const res = await api.updateTender(tenderId, payload);
+                
+                if (res.success) {
+                    alert('Tender successfully awarded!');
+                    window.location.reload(); // simple refresh to update UI state
+                } else {
+                    alert('Error awarding tender: ' + res.error);
+                }
+            } catch(e) {
+                console.error(e);
+                alert('Failed to award tender. Check console.');
+            }
         }
 
         // Fix modal hiding class logic since our CSS uses display: none !important

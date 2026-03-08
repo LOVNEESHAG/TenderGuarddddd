@@ -45,6 +45,14 @@ const api = {
         });
         return res.json();
     },
+    updateTender: async (id, data) => {
+        const res = await fetch(`${API_URL}/tenders/${id}`, {
+            method: 'PUT',
+            headers: api.getAuthHeaders(),
+            body: JSON.stringify(data)
+        });
+        return res.json();
+    },
 
     // Bids
     getBids: async (tenderId) => {
