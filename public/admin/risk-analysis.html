@@ -79,9 +79,11 @@
         </div>
     </div>
 
+    <script src="https://cdn.auth0.com/js/auth0-spa-js/2.1/auth0-spa-js.production.js"></script>
     <script src="/js/api.js"></script>
     <script>
-        checkAuth('admin');
+        (async () => {
+        await checkAuth('admin');
 
         // Check if tenderId passed in URL
         const urlParams = new URLSearchParams(window.location.search);
@@ -217,6 +219,7 @@
         document.head.appendChild(style);
 
         document.addEventListener('DOMContentLoaded', init);
+        })();
     </script>
 </body>
 

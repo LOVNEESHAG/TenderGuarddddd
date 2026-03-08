@@ -59,8 +59,8 @@
             <div class="nav-links" id="guest-nav">
                 <a href="#features">Features</a>
                 <a href="/public/portal.html">Public Portal</a>
-                <a href="/login.html" class="btn btn-outline" style="padding: 0.4rem 1rem;">Log In</a>
-                <a href="/register.html" class="btn btn-primary" style="padding: 0.4rem 1rem;">Sign Up</a>
+                <a href="javascript:void(0)" onclick="api.loginWithRedirect()" class="btn btn-outline" style="padding: 0.4rem 1rem;">Log In</a>
+                <a href="javascript:void(0)" onclick="api.loginWithRedirect()" class="btn btn-primary" style="padding: 0.4rem 1rem;">Sign Up</a>
             </div>
             <div class="nav-links hidden" id="auth-nav">
                 <a href="#" id="dashboard-link">Dashboard</a>
@@ -75,7 +75,7 @@
             <h2>TenderGuard AI : Transparent Infrastructure Tendering</h2>
             <p>Lowest justified and lowest risk wins — not just lowest price. A revolutionary platform preventing cartels and fake documentation.</p>
             <div class="flex justify-center gap-4 mt-9 ">
-                <a href="/register.html" class="btn btn-primary">Get Started <i class="fa-solid fa-arrow-right ml-2" style="margin-left: 0.5rem; font-size: 0.8rem;"></i></a>
+                <a href="javascript:void(0)" onclick="api.loginWithRedirect()" class="btn btn-primary">Get Started <i class="fa-solid fa-arrow-right ml-2" style="margin-left: 0.5rem; font-size: 0.8rem;"></i></a>
                 <a href="/public/portal.html" class="btn btn-primary">View Public Portal</a>
             </div>
         </div>
@@ -146,7 +146,7 @@
             <div class="flex justify-center gap-6 mb-8 text-sm">
                 <a href="#features" class="text-muted">Features</a>
                 <a href="/public/portal.html" class="text-muted">Public Portal</a>
-                <a href="/login.html" class="text-muted">Log In</a>
+                <a href="javascript:void(0)" onclick="api.loginWithRedirect()" class="text-muted">Log In</a>
             </div>
             <div style="height: 1px; width: 100%; max-width: 400px; margin: 0 auto; background: var(--border); margin-bottom: 2rem;"></div>
             <p style="font-size: 0.875rem;">&copy; 2026 TenderGuard AI. Building a transparent future.</p>
@@ -155,7 +155,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const token = localStorage.getItem('token');
+            const token = localStorage.getItem('auth0_token');
             const userStr = localStorage.getItem('user');
             if (token && userStr) {
                 const user = JSON.parse(userStr);
@@ -172,13 +172,13 @@
                 }
             }
 
-            document.getElementById('logout-btn')?.addEventListener('click', () => {
-                localStorage.removeItem('token');
-                localStorage.removeItem('user');
-                window.location.href = '/';
+            document.getElementById('logout-btn')?.addEventListener('click', async () => {
+                await api.logout();
             });
         });
     </script>
     <script src="/js/geo-notify.js"></script>
+    <script src="https://cdn.auth0.com/js/auth0-spa-js/2.1/auth0-spa-js.production.js"></script>
+    <script src="/js/api.js"></script>
 </body>
 </html>

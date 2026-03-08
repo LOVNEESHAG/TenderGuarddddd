@@ -90,9 +90,11 @@
         </form>
     </div>
 
+    <script src="https://cdn.auth0.com/js/auth0-spa-js/2.1/auth0-spa-js.production.js"></script>
     <script src="/js/api.js"></script>
     <script>
-        checkAuth('contractor');
+        (async () => {
+        await checkAuth('contractor');
 
         const urlParams = new URLSearchParams(window.location.search);
         const tenderId = urlParams.get('id');
@@ -155,6 +157,7 @@
                 btn.innerHTML = '<i class="fa-solid fa-lock mr-2"></i> Submit Encrypted Bid';
             }
         });
+        })();
     </script>
 </body>
 

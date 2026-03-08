@@ -43,9 +43,11 @@
         </main>
     </div>
 
+    <script src="https://cdn.auth0.com/js/auth0-spa-js/2.1/auth0-spa-js.production.js"></script>
     <script src="/js/api.js"></script>
     <script>
-        checkAuth('contractor');
+        (async () => {
+        await checkAuth('contractor');
 
         async function loadTenders() {
             try {
@@ -94,6 +96,7 @@
         }
 
         document.addEventListener('DOMContentLoaded', loadTenders);
+        })();
     </script>
 </body>
 

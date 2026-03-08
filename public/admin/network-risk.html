@@ -100,9 +100,11 @@
         </main>
     </div>
 
+    <script src="https://cdn.auth0.com/js/auth0-spa-js/2.1/auth0-spa-js.production.js"></script>
     <script src="/js/api.js"></script>
     <script>
-        const user = checkAuth('admin');
+        (async () => {
+        const user = await checkAuth('admin');
 
         async function init() {
             try {
@@ -187,6 +189,7 @@
         }
 
         document.addEventListener('DOMContentLoaded', init);
+        })();
     </script>
 </body>
 

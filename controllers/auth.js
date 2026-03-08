@@ -1,75 +1,47 @@
 const User = require('../models/User');
-const jwt = require('jsonwebtoken');
 
-// Get token from model, create cookie and send response
-const sendTokenResponse = (user, statusCode, res) => {
-    // Create token
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET || 'secretkey', {
-        expiresIn: '30d'
-    });
-
-    res.status(statusCode).json({
-        success: true,
-        token,
-        user: {
-            id: user._id,
-            name: user.name,
-            email: user.email,
-            role: user.role
-        }
-    });
-};
-
-// @desc    Register user
-// @route   POST /api/auth/register
-// @access  Public
-exports.register = async (req, res) => {
+// @desc    Synchronize Auth0 user with local database
+// @route   POST /api/auth/sync
+// @access  Private (Needs valid Auth0 Token)
+exports.sync = async (req, res) => {
     try {
-        const { name, email, password, role } = req.body;
-
-        // Create user
-        const user = await User.create({
-            name,
-            email,
-            password,
-            role
-        });
-
-        sendTokenResponse(user, 200, res);
-    } catch (err) {
-        res.status(400).json({ success: false, error: err.message });
-    }
-};
-
-// @desc    Login user
-// @route   POST /api/auth/login
-// @access  Public
-exports.login = async (req, res) => {
-    try {
-        const { email, password } = req.body;
-
-        // Validate emil & password
-        if (!email || !password) {
-            return res.status(400).json({ success: false, error: 'Please provide an email and password' });
+        const auth0Id = req.auth.payload.sub;
+        
+        // Extract email and name from request body
+        const { email, name } = req.body;
+        
+        if (!auth0Id) {
+            return res.status(400).json({ success: false, error: 'No Auth0 ID found in token payload' });
         }
 
-        // Check for user
-        const user = await User.findOne({ email }).select('+password');
+        let user = await User.findOne({ auth0Id });
 
         if (!user) {
-            return res.status(401).json({ success: false, error: 'Invalid credentials' });
+            // Also check by email to map existing users
+            if (email) {
+                user = await User.findOne({ email });
+            }
+            
+            if (user) {
+                user.auth0Id = auth0Id;
+                await user.save();
+            } else {
+                // Create new user
+                user = await User.create({
+                    auth0Id,
+                    email: email || `${auth0Id}@placeholder.com`,
+                    name: name || 'Citizen'
+                });
+            }
         }
 
-        // Check if password matches
-        const isMatch = await user.matchPassword(password);
-
-        if (!isMatch) {
-            return res.status(401).json({ success: false, error: 'Invalid credentials' });
-        }
-
-        sendTokenResponse(user, 200, res);
+        res.status(200).json({
+            success: true,
+            data: user
+        });
     } catch (err) {
-        res.status(400).json({ success: false, error: err.message });
+        console.error('Sync Error:', err);
+        res.status(500).json({ success: false, error: 'Server Error during user sync' });
     }
 };
 
@@ -77,13 +49,8 @@ exports.login = async (req, res) => {
 // @route   GET /api/auth/me
 // @access  Private
 exports.getMe = async (req, res) => {
-    try {
-        const user = await User.findById(req.user.id);
-        res.status(200).json({
-            success: true,
-            data: user
-        });
-    } catch (err) {
-        res.status(400).json({ success: false, error: err.message });
-    }
+    res.status(200).json({
+        success: true,
+        data: req.user
+    });
 };
