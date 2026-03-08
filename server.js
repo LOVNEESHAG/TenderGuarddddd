@@ -18,7 +18,7 @@ app.use(express.json());
 // Enable CORS
 app.use(cors());
 
-// Set static folder
+// Static folders
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
@@ -30,7 +30,7 @@ app.use('/api/complaints', require('./routes/complaints'));
 app.use('/api/stats', require('./routes/stats'));
 app.use('/api/tts', require('./routes/tts'));
 
-// Error Handling Middleware to ensure API always returns JSON
+// Error handling middleware
 app.use((err, req, res, next) => {
     console.error('Unhandled Error:', err);
     res.status(err.status || 500).json({
@@ -38,11 +38,3 @@ app.use((err, req, res, next) => {
         error: err.message || 'Server Error'
     });
 });
-
-const PORT = process.env.PORT || 3000;
-
-// app.listen(PORT, () => {
-//     console.log(`Server running on port ${PORT}`);
-// });
-
-module.exports = app;
