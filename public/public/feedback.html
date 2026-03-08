@@ -171,10 +171,8 @@
         </div>
     </div>
 
-    <script src="https://cdn.auth0.com/js/auth0-spa-js/2.1/auth0-spa-js.production.js"></script>
     <script src="/js/api.js"></script>
     <script>
-        (async () => {
         let currentTenderId = null;
         let currentLat = null;
         let currentLng = null;
@@ -200,9 +198,9 @@
         });
 
         // Ensure user is logged in (Public role)
-        const user = await checkAuth('public');
+        const user = checkAuth('public');
         if (!user) {
-            api.loginWithRedirect();
+            window.location.href = '/login.html';
         }
 
         async function findNearbyProjects(position) {
@@ -303,7 +301,6 @@
         function closeModal(id) {
             document.getElementById(id).classList.remove('active');
         }
-        })();
     </script>
 </body>
 

@@ -70,11 +70,9 @@
         </main>
     </div>
 
-    <script src="https://cdn.auth0.com/js/auth0-spa-js/2.1/auth0-spa-js.production.js"></script>
     <script src="/js/api.js"></script>
     <script>
-        (async () => {
-        const user = await checkAuth('contractor');
+        const user = checkAuth('contractor');
         if (user) {
             document.getElementById('user-name').textContent = user.name;
             document.getElementById('welcome-name').textContent = user.name.split(' ')[0];
@@ -139,7 +137,6 @@
         }
 
         document.addEventListener('DOMContentLoaded', loadTenders);
-        })();
     </script>
 </body>
 

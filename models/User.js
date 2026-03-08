@@ -2,11 +2,6 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
 const UserSchema = new mongoose.Schema({
-    auth0Id: {
-        type: String,
-        sparse: true,
-        unique: true
-    },
     name: {
         type: String,
         required: [true, 'Please add a name']

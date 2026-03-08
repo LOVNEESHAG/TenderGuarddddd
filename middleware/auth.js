@@ -1,33 +1,37 @@
-const { auth } = require('express-oauth2-jwt-bearer');
+const jwt = require('jsonwebtoken');
 const User = require('../models/User');
-
-const jwtCheck = auth({
-  audience: process.env.AUTH0_AUDIENCE,
-  issuerBaseURL: `https://${process.env.AUTH0_DOMAIN}/`,
-  tokenSigningAlg: 'RS256'
-});
 
 // Protect routes
 exports.protect = async (req, res, next) => {
-    jwtCheck(req, res, async (err) => {
-        if (err) {
-            return res.status(401).json({ success: false, error: 'Not authorized to access this route' });
+    let token;
+
+    if (
+        req.headers.authorization &&
+        req.headers.authorization.startsWith('Bearer')
+    ) {
+        // Set token from Bearer token in header
+        token = req.headers.authorization.split(' ')[1];
+    }
+
+    // Make sure token exists
+    if (!token) {
+        return res.status(401).json({ success: false, error: 'Not authorized to access this route' });
+    }
+
+    try {
+        // Verify token
+        const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secretkey');
+
+        req.user = await User.findById(decoded.id);
+
+        if (!req.user) {
+            return res.status(401).json({ success: false, error: 'User associated with token no longer exists. Please log in again.' });
         }
 
-        try {
-            // Find user by Auth0 ID
-            let user = await User.findOne({ auth0Id: req.auth.payload.sub });
-
-            if (!user) {
-                return res.status(401).json({ success: false, error: 'User profile not synchronized. Please log in again.' });
-            }
-
-            req.user = user;
-            next();
-        } catch (error) {
-            return res.status(401).json({ success: false, error: 'Not authorized to access this route' });
-        }
-    });
+        next();
+    } catch (err) {
+        return res.status(401).json({ success: false, error: 'Not authorized to access this route' });
+    }
 };
 
 // Grant access to specific roles
